@@ -14,27 +14,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  static const String _publicId = 'Your publicId';
+  static const String _gateway = 'Your gateway';
+
   bool _possiblyShowGooglePayButton = false;
-  bool loading = false;
+  bool _loading = false;
   String _googlePayToken = 'Unknown';
 
   @override
   void initState() {
     super.initState();
     possiblyShowGooglePayButton();
-  }
-
-
-  Future<void> possiblyShowGooglePayButton() async {
-    bool possiblyShowGooglePayButton;
-    try {
-      possiblyShowGooglePayButton = await GooglePayFlutter.possiblyShowGooglePayButton;
-    } on PlatformException {
-      possiblyShowGooglePayButton = false;
-    }
-    setState(() {
-      _possiblyShowGooglePayButton = possiblyShowGooglePayButton;
-    });
   }
 
   @override
@@ -51,15 +41,16 @@ class _MyAppState extends State<MyApp> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('possiblyShowGooglePayButton: $_possiblyShowGooglePayButton\n\nToken: $_googlePayToken'),
-                  if(_possiblyShowGooglePayButton)FlatButton(
-                    child: Text('Pay'),
-                    onPressed: payButton,
-                    color: Colors.blue,
-                  )
+                  if (_possiblyShowGooglePayButton)
+                    FlatButton(
+                      child: Text('Pay'),
+                      onPressed: payButton,
+                      color: Colors.blue,
+                    )
                 ],
               ),
             ),
-            if (loading)
+            if (_loading)
               Container(
                 height: double.infinity,
                 width: double.infinity,
@@ -74,20 +65,32 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  Future<void> possiblyShowGooglePayButton() async {
+    bool possiblyShowGooglePayButton;
+    try {
+      possiblyShowGooglePayButton = await GooglePayFlutter.possiblyShowGooglePayButton;
+    } on PlatformException {
+      possiblyShowGooglePayButton = false;
+    }
+    setState(() {
+      _possiblyShowGooglePayButton = possiblyShowGooglePayButton;
+    });
+  }
+
   void payButton() async {
     setState(() {
-      loading = true;
+      _loading = true;
     });
     Map<bool, String> x = await GooglePayFlutter.requestPayment(
       currencyCode: 'RUB',
-      gateway: 'cloudpayments',
+      gateway: _gateway,
       price: 10,
-      publicId: 'pk_3d2a65d891ee53d6b13961bc48a69',
-      isTestEnvironment: true
+      publicId: _publicId,
+      isTestEnvironment: true,
     );
     _googlePayToken = x.values.first;
     setState(() {
-      loading = false;
+      _loading = false;
     });
   }
 }

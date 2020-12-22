@@ -1,3 +1,3 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+First release Google Pay for Flutter
